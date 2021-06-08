@@ -6,7 +6,6 @@ import TemplateContabil.Model.Entity.Importation;
 import TemplateContabil.Model.ImportationModel;
 import fileManager.FileManager;
 import java.io.File;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +28,16 @@ public class Model {
         public void run() {
             //Pega o arquivo PDF da importation
             File file = importation.getFile();
+            
+            String mesStr = (mes<10?"0":"") + mes;
 
             //Cria Configuração
             Map<String, Map<String, String>> cfgCols = new HashMap<>();
-            cfgCols.put("data", XLSX.convertStringToConfig("data", "-collumn¬A¬-type¬string¬-required¬true¬-regex¬[0-9]{2} *\\/ *[a-zA-z]{3}"));
-            cfgCols.put("hist", XLSX.convertStringToConfig("hist", "-collumn¬B¬-type¬string¬-required¬true"));
-            cfgCols.put("agencia", XLSX.convertStringToConfig("agencia", "-collumn¬C¬-type¬string"));
-            cfgCols.put("valor", XLSX.convertStringToConfig("valor", "-collumn¬D§E¬-type¬string¬-required¬true"));
+            cfgCols.put("data", XLSX.convertStringToConfig("data", "-collumn¬A¬-type¬string¬-required¬true¬-regex¬[0-9]{2} *\\/ *" + mesStr));
+            cfgCols.put("hist", XLSX.convertStringToConfig("hist", "-collumn¬B§C¬-type¬string¬-required¬true"));
+            cfgCols.put("agencia", XLSX.convertStringToConfig("agencia", "-collumn¬D¬-type¬string¬-regex¬[0-9]+"));
+            cfgCols.put("valorD", XLSX.convertStringToConfig("valorD", "-collumn¬D¬-type¬string¬-regex¬[-]?[0-9]*[.]*[0-9]+[,][0-9]{2}"));
+            cfgCols.put("valorE", XLSX.convertStringToConfig("valorE", "-collumn¬E¬-type¬string¬-regex¬[-]?[0-9]*[.]*[0-9]+[,][0-9]{2}"));
 
             //Pega os dados do Excel
             List<Map<String, Object>> rows = XLSX.get(file, cfgCols);
@@ -47,19 +49,23 @@ public class Model {
                 if (!row.get("hist").toString().contains("SALDO")) {
                     //Arruma data deixando apenas o dia
                     String data = row.get("data").toString().replaceAll("[^0-9]*", "");
-                    data += "/" + mes + "/" + ano;
+                    data += "/" + ano;
 
                     csvtext.append("\r\n");
                     csvtext.append(data).append(";");
 
                     csvtext.append(row.get("hist").toString());
                     //Se tiver agencia
-                    if (row.containsKey("agencia") && row.get("agencia") != null) {
+                    if (row.containsKey("agencia") && row.get("agencia") != null && !row.get("agencia").toString().equals("")) {
                         csvtext.append(" Agencia Origem: ").append(row.get("agencia").toString());
                     }
                     csvtext.append(";");                   
 
-                    csvtext.append(row.get("valor").toString().trim());
+                    if(row.containsKey("valorD") && row.get("valorD") != null && !row.get("valorD").toString().equals("") ){
+                        csvtext.append(row.get("valorD").toString().trim());
+                    }else if(row.containsKey("valorE") && row.get("valorE") != null && !row.get("valorE").toString().equals("") ){
+                        csvtext.append(row.get("valorE").toString().trim());
+                    }
                 }
             }
 

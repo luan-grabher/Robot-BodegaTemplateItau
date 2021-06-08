@@ -9,7 +9,7 @@ public class teste {
         
         parametros.append("[mes:1]");
         parametros.append("[ano:2021]");
-        parametros.append("[ini:robot-brilia]");
+        parametros.append("[ini:robot-bodega]");
 
         Main.testParameters = parametros.toString();
         args = new String[]{"test"};
