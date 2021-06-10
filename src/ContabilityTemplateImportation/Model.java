@@ -46,9 +46,9 @@ public class Model {
 
             //Percorre Excel
             for (Map<String, Object> row : rows) {
-                if (!row.get("hist").toString().contains("SALDO")) {
+                if (!row.get("hist").toString().contains("SALDO") && !row.get("hist").toString().contains("S A L D O")) {
                     //Arruma data deixando apenas o dia
-                    String data = row.get("data").toString().replaceAll("[^0-9]*", "");
+                    String data = row.get("data").toString().replaceAll("[^0-9/]*", "");
                     data += "/" + ano;
 
                     csvtext.append("\r\n");
